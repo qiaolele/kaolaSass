@@ -1,0 +1,224 @@
+/* ————————————————定义变量开始———————————————— */
+$blue: #1875e7;//声明变量
+$side: left;
+$fontSize: 12px;
+$baseLineHeight: 5;//重置默认变量
+$baseLineHeight: 1.5 !default;//声明默认变量
+
+/* ————————————————使用变量开始———————————————— */
+div {
+  color: $blue;
+}
+.title {
+  border-#{$side}-radius: 5px;
+  line-height: $baseLineHeight;
+}
+body {
+  font-size: $fontSize;
+  line-height: $baseLineHeight;
+}
+
+/* ————————————————定义一个按钮———————————————— */
+$brand-primary: darken(#428bca,6.5%)  !default;
+$btn-primary-color: #fff !default;
+$btn-primary-bg: $brand-primary !default;
+$btn-primary-border: darken($btn-primary-bg,5%) !default;
+
+.btn-primary {
+  background-color: $btn-primary-bg;
+  color: $btn-primary-color;
+  border: 1px solid $btn-primary-border;
+}
+
+/* ————————————————定义全局变量和局部变量———————————————— */
+$globalBlColor: #f00;//全局变量
+.globalBL {
+  color: $globalBlColor;
+}
+.localBL {
+  $localBlColor: #099;//局部变量
+  color: $localBlColor;
+}
+
+/* ————————————————嵌套-选择器嵌套———————————————— */
+//& 选择符置前表示该元素为嵌套元素的子级，置后表示该元素为嵌套元素的父级。 header &相当于header nav a
+nav a {
+  color:$blue;
+  header & {
+    color: green;
+  }
+}
+
+/* ————————————————嵌套-属性嵌套———————————————— */
+//CSS 有一些属性前缀相同，只是后缀不一样，比如：border-top/border-right，与这个类似的还有 margin、padding、font 等属性
+.box{
+  border: {
+    top: 1px solid red;
+    bottom: 1px solid green;
+  }
+  font: {
+    size: 16px;
+    family: 'Adobe 楷体 Std R';
+  }
+  margin: {
+    top: 10px;
+    bottom: 5px;
+  }
+}
+.daohang li{
+  float:left;
+  width:100px;
+  margin-right: 10px;
+  background: #ccc;
+  text-align: center;
+  list-style: none;
+}
+
+/* ————————————————封装清除浮动———————————————— */
+.clearfix {
+  &:before,
+  &:after {
+    content: '';
+    display: table;
+  }
+  &:after {
+    clear:both;
+    overflow:hidden;
+  }
+}
+
+/* ————————————————继承———————————————— */
+//SASS允许一个选择器，继承另一个选择器。比如，现有styleBg要继承styleFont，就要使用@extend命令：
+.styleFont{
+  color: #f00;
+}
+.styleBg{
+  background: #099;
+  @extend .styleFont;
+  font-size: 120%;
+}
+
+/* ————————————————封装定义一个按钮的两种状态———————————————— */
+.btn{
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  font-size:14px;
+}
+.btn-primary {
+  background: #009999;
+  color: #ffffff;
+  @extend .btn
+}
+.btn-active {
+  background: #cccccc;
+  color: #fff;
+  @extend .btn
+}
+
+/* ————————————————设置宏，带参数，不带参数，多个参数———————————————— */
+@mixin left {
+  float: left;
+  margin-left: 10px;
+  padding: 10px;
+}
+@mixin border($value: 5px) {
+  border: $value solid #00f;
+}
+@mixin rounded($vert,$horz,$radius: 10px) {
+  border-#{$vert}-#{$horz}-radius: $radius;
+  -moz-border-radius-#{$vert}-#{$horz}: $radius;
+  -webkit-border-#{$vert}-#{$horz}-radius: $radius;
+}
+/* ————————————————调用宏，带参数，不带参数，多个参数———————————————— */
+a{
+  @include left;
+  //@include border();//不传值就是默认值
+  @include border(3px);
+  @include rounded(bottom,right,13px);
+}
+
+/* ————————————————定义占位符——不用不会产生冗余代码———————————————— */
+%alignCenter {
+  margin: 0 auto;
+  text-align: center;
+}
+/* ————————————————使用占位符———————————————— */
+.container {
+  width:1000px;
+  @extend %alignCenter;
+}
+
+/* ————————————————封装一个具有共同特点的属性样式———————————————— */
+@mixin generate-sizes($class, $small, $medium, $big) {
+  .#{$class}-small { font-size: $small; }
+  .#{$class}-medium { font-size: $medium; }
+  .#{$class}-big { font-size: $big; }
+}
+@include generate-sizes("header-text", 12px, 20px, 40px);
+.aaa{
+  li{
+    float:left;
+    height:20px;
+    line-height:20px;
+    margin-right: 15px;
+  }
+  list-style:none;
+}
+
+/* ————————————————封装一个显示隐藏变量———————————————— */
+@mixin blockOrHidden ($boolean:true) {
+  @if $boolean {
+    @debug "$boolean is #{$boolean}";
+    display:block;
+  }@else {
+    @debug "$boolean is #{$boolean}";
+    display: none;
+  }
+}
+.block {
+  @include blockOrHidden;
+}
+.hidden {
+  @include blockOrHidden(false);
+}
+
+/* ————————————————for循环定义具有相同关键字样式———————————————— */
+//through表示包括end这个值；to表示不包括end这个值
+@for $i from 1 through 3{
+  .item-#{$i} {display:inline-block;border:1px solid #f00;width: 200px * $i;}
+}
+
+/* ————————————————for循环定义栅格布局———————————————— */
+$grid-prefix: span !default;
+$grid-width: 60px !default;
+$grid-gutter: 20px !default;
+
+%grid {
+  float: left;
+  margin-left: $grid-gutter / 2;
+  margin-right: $grid-gutter / 2;
+}
+@for $i from 1 through 12 {
+  .#{$grid-prefix}#{$i} {
+    width: $grid-width * $i + $grid-gutter * ($i - 1);
+    @extend %grid;
+    background: #ccc;
+  }
+}
+
+/* ————————————————跳出根元素———————————————— */
+.a{
+  color: red;
+  .b{
+    color: orange;
+    list-style:none;
+    background:#ccc;
+    .c{
+      color: yellow;
+
+      @at-root .d{
+        color: green;
+      }
+    }
+  }
+}
